@@ -2,7 +2,6 @@ package tsvetkov.daniil.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import tsvetkov.daniil.Main;
 import tsvetkov.daniil.dto.AuthorDTO;
 import tsvetkov.daniil.dto.BookDTO;
 import tsvetkov.daniil.dto.GenreDTO;
@@ -10,7 +9,6 @@ import tsvetkov.daniil.repository.AuthorRepository;
 import tsvetkov.daniil.repository.BookRepository;
 import tsvetkov.daniil.repository.GenreRepository;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -36,8 +34,6 @@ public class MainService {
         if (Objects.nonNull(book.getGenres())) {
             book.getGenres().forEach(this::addGenre);
         }
-
-        System.out.println("Saving book...");
         return bookRepository.save(book);
     }
 
@@ -55,15 +51,15 @@ public class MainService {
 
     public GenreDTO addGenre(GenreDTO genre) {
         if (Objects.nonNull(genre) && genreRepository.findByName(genre.getName()).isEmpty()) {
-            System.out.println("Saving genre...");
             return genreRepository.save(genre);
         }
-        return null;
+        GenreDTO h =genreRepository.findByName(genre.getName()).get();
+        genre.setId(h.getId());
+        return genre;
     }
 
     public AuthorDTO addAuthor(AuthorDTO author) {
         if (Objects.nonNull(author) && !authorRepository.isExists(author)) {
-            System.out.println("Saving author...");
             return authorRepository.save(author);
         }
         return null;

@@ -2,7 +2,7 @@ package tsvetkov.daniil.repository;
 
 import tsvetkov.daniil.dto.GenreDTO;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -12,4 +12,5 @@ public interface GenreRepository {
     Optional<GenreDTO> findById(int id);
     Set<GenreDTO> findAll();
     Optional<GenreDTO> findByName(String name);
+    List<GenreDTO> findGenresByBookId(int bookId);
 }
