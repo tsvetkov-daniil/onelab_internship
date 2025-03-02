@@ -1,20 +1,18 @@
 package tsvetkov.daniil;
 
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import tsvetkov.daniil.dto.AuthorDTO;
 import tsvetkov.daniil.dto.BookDTO;
 import tsvetkov.daniil.dto.GenreDTO;
 import tsvetkov.daniil.service.MainService;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 
 @ComponentScan
+@EnableAspectJAutoProxy
 public class Main {
     public static void main(String[] args) {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Main.class);
