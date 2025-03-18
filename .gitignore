@@ -1,4 +1,5 @@
 # Java
+*.hprof
 .mtj.
 tmp/
 *.env
@@ -7,6 +8,7 @@ tmp/
 *.war
 *.ear
 *.nar
+es/*
 hs_err_pid*
 replay_pid*
 

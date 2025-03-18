@@ -1,2 +1,8 @@
 rootProject.name = 'OneLabProject'
+include 'msbooks'
+include 'mssearch'
+include 'common'
+include 'msreviews'
+include 'application'
+include 'ms_auth'
 
