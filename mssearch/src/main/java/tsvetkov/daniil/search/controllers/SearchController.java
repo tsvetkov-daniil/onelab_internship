@@ -1,4 +1,4 @@
-package tsvetkov.daniil.search.controller;
+package tsvetkov.daniil.search.controllers;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,7 +52,7 @@ public class SearchController {
 
         List<Book> filteredBooks = books.stream()
                 .filter(hasRecentDate)
-                .sorted(Comparator.comparing(Book::getPrice)) // Сортировка по цене
+                .sorted(Comparator.comparing(Book::getPrice))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(filteredBooks);
     }
@@ -79,7 +79,7 @@ public class SearchController {
     @GetMapping("/books/filter-by-date")
     public ResponseEntity<List<Book>> filterBooksByDate(
             @RequestParam String query,
-            @RequestParam String dateAfter, // Формат: "2020-01-01T00:00:00"
+            @RequestParam String dateAfter,
             @RequestParam(defaultValue = "0") int pageNumber,
             @RequestParam(defaultValue = "10") int pageSize) {
         LocalDateTime afterDate = LocalDateTime.parse(dateAfter);
@@ -102,12 +102,20 @@ public class SearchController {
             @RequestParam String prefix,
             @RequestParam(defaultValue = "10") Integer size) throws IOException {
         List<String> suggestions = authorSearchService.suggestAuthorNames(prefix, size);
-
+        long sequentialTime = System.nanoTime();
         List<String> sequential = suggestions.stream()
                 .filter(s -> s.length() > 3)
                 .collect(Collectors.toList());
+        sequentialTime = System.nanoTime() - sequentialTime;
 
-        return ResponseEntity.ok(sequential);
+        long parallelTime = System.nanoTime();
+        List<String> parallel = suggestions.parallelStream()
+                .filter(s -> s.length() > 3)
+                .collect(Collectors.toList());
+        parallelTime = System.nanoTime() - parallelTime;
+
+        System.out.println("Последовательный: " + sequentialTime + " ns, Паралельный: " + parallelTime + " ns");
+        return ResponseEntity.ok(parallel);
     }
 
     @GetMapping("/categories/suggest")
