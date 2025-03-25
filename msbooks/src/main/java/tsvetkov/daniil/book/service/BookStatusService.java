@@ -1,67 +1,67 @@
 package tsvetkov.daniil.book.service;
 
 import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tsvetkov.daniil.book.dto.BookStatus;
+import org.springframework.validation.annotation.Validated;
+import tsvetkov.daniil.book.entity.BookStatus;
+import tsvetkov.daniil.book.exception.BookStatusNotFoundException;
 import tsvetkov.daniil.book.repository.BookStatusRepository;
 
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-@Slf4j
 @Service
+@AllArgsConstructor
+@Validated
 public class BookStatusService {
-    private final BookStatusRepository bookStatusRepository;
 
-    @Autowired
-    public BookStatusService(BookStatusRepository bookStatusRepository) {
-        this.bookStatusRepository = bookStatusRepository;
-    }
+    public static final String DEFAULT_STATUS_NAME = "На модерации";
+    private static final String DEFAULT_STATUS_DESCRIPTION = "Книга не опубликована, ожидает одобрения модерации";
+
+    private final BookStatusRepository bookStatusRepository;
 
     @Transactional
     public BookStatus save(@Valid BookStatus bookStatus) {
         return bookStatusRepository.save(bookStatus);
     }
-
+    @Transactional(readOnly = true)
     public BookStatus findById(Long id) {
         return bookStatusRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Статус с таким id не найден"));
+                .orElseThrow(BookStatusNotFoundException::new);
     }
-
+    @Transactional(readOnly = true)
     public Set<BookStatus> findAll(Integer pageNumber, Integer pageSize) {
         return new HashSet<>(bookStatusRepository.findAll(PageRequest.of(pageNumber, pageSize)).getContent());
     }
 
-
     @Transactional
     public void deleteById(Long id) {
-        if (!bookStatusRepository.existsById(id)) {
-            throw new IllegalArgumentException("Статус книги не найден");
-        }
-        bookStatusRepository.deleteById(id);
-    }
-
-    public Optional<BookStatus> findByTitle(String name) {
-        return bookStatusRepository.findByTitle(name);
+        BookStatus status = findById(id);
+        bookStatusRepository.delete(status);
     }
 
     @Transactional
     public void deleteAll() {
         bookStatusRepository.deleteAll();
     }
+    @Transactional(readOnly = true)
+    public Optional<BookStatus> findByTitle(String title) {
+        return bookStatusRepository.findByTitle(title);
+    }
 
+    // TODO ddd
     @Transactional
     public BookStatus getDefaultStatus() {
-        String defaultStatusName = "Added";
-        return this.findByTitle(defaultStatusName)
+        return findByTitle(DEFAULT_STATUS_NAME)
                 .orElseGet(() -> bookStatusRepository.save(BookStatus.builder()
-                        .title(defaultStatusName)
-                        .description("Книга опубликована")
+                        .title(DEFAULT_STATUS_NAME)
+                        .description(DEFAULT_STATUS_DESCRIPTION)
                         .build()));
     }
+
+
 }

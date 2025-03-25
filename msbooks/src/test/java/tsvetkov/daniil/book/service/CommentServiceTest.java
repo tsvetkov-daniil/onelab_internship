@@ -8,11 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
-import tsvetkov.daniil.book.dto.Book;
-import tsvetkov.daniil.book.dto.Category;
-import tsvetkov.daniil.book.dto.Comment;
-import tsvetkov.daniil.book.dto.Language;
-import tsvetkov.daniil.book.dto.Score;
+import tsvetkov.daniil.book.entity.Book;
+import tsvetkov.daniil.book.entity.Category;
+import tsvetkov.daniil.book.entity.Comment;
+import tsvetkov.daniil.book.entity.Language;
+import tsvetkov.daniil.book.entity.Score;
 import tsvetkov.daniil.book.repository.CommentRepository;
 
 import java.util.Date;

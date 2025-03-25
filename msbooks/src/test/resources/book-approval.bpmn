@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+             targetNamespace="Examples">
+  <process id="exampleProcess" isExecutable="true">
+    <startEvent id="startEvent" name="Start"/>
+    <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="task1"/>
+    <serviceTask id="task1" name="Service Task" camunda:delegateExpression="#{exampleDelegate}"/>
+    <sequenceFlow id="flow2" sourceRef="task1" targetRef="endEvent"/>
+    <endEvent id="endEvent" name="End"/>
+  </process>
+</definitions>

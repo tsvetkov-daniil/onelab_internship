@@ -40,6 +40,27 @@ services:
     ports:
       - "9200:9200"
       - "9300:9300"
+  camunda:
+    image: camunda/camunda-bpm-platform:latest
+    container_name: camunda
+    ports:
+      - "8086:8080"
+    environment:
+      - CAMUNDA_DB_URL=jdbc:postgresql://db:5432/camunda
+      - CAMUNDA_DB_USERNAME=camunda
+      - CAMUNDA_DB_PASSWORD=camunda
+    depends_on:
+      - db
+
+
+  db:
+    image: postgres:13
+    container_name: camunda-db
+    environment:
+      - POSTGRES_USER=camunda
+      - POSTGRES_PASSWORD=camunda
+      - POSTGRES_DB=camunda
+
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest

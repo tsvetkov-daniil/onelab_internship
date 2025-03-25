@@ -2,7 +2,7 @@ package tsvetkov.daniil.book.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import tsvetkov.daniil.book.dto.Language;
+import tsvetkov.daniil.book.entity.Language;
 
 import java.util.Optional;
 

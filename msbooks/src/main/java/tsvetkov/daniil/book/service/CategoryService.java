@@ -1,34 +1,35 @@
 package tsvetkov.daniil.book.service;
 
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tsvetkov.daniil.book.dto.Category;
-import tsvetkov.daniil.book.event.EventProducer;
+import org.springframework.validation.annotation.Validated;
+import tsvetkov.daniil.book.entity.Category;
+import tsvetkov.daniil.book.exception.CategoryNotFoundException;
 import tsvetkov.daniil.book.repository.CategoryRepository;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 @Service
+@AllArgsConstructor
+@Validated
 public class CategoryService {
+
     private final CategoryRepository categoryRepository;
     private final EventProducer eventProducer;
 
-    @Autowired
-    public CategoryService(CategoryRepository categoryRepository, EventProducer eventProducer) {
-        this.categoryRepository = categoryRepository;
-        this.eventProducer = eventProducer;
-    }
-
-    public Category findById(Long id) throws IllegalArgumentException {
+    @Transactional(readOnly = true)
+    public Category findById(Long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Категория с таким id не найдена"));
+                .orElseThrow(CategoryNotFoundException::new);
     }
 
-    public List<Category> findAll() {
-        return categoryRepository.findAll();
+    @Transactional(readOnly = true)
+    public Set<Category> findAll(Integer pageNumber, Integer pageSize) {
+        return new HashSet<>(categoryRepository.findAll(PageRequest.of(pageNumber, pageSize)).getContent());
     }
 
     @Transactional
@@ -37,18 +38,19 @@ public class CategoryService {
     }
 
     @Transactional
-    public void deleteById(Long id) throws IllegalArgumentException {
-        this.findById(id);
+    public void deleteById(Long id) {
+        findById(id);
         categoryRepository.deleteById(id);
         eventProducer.removeCatFromSearch(id);
     }
 
-
-    public Set<Category> findSubcategories(Long id) throws IllegalArgumentException {
-        this.findById(id);
-        return categoryRepository.findByParentCategory_id(id);
+    @Transactional(readOnly = true)
+    public Set<Category> findSubcategories(Long id) {
+        findById(id);
+        return categoryRepository.findByParentCategoryId(id);
     }
 
+    @Transactional(readOnly = true)
     public boolean existsByName(String name) {
         return categoryRepository.existsByName(name);
     }

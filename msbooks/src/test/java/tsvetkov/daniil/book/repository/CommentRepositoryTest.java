@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
-import tsvetkov.daniil.book.dto.*;
+import tsvetkov.daniil.book.entity.*;
 
 import java.util.Date;
 import java.util.HashSet;

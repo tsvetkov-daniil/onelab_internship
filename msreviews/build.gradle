@@ -27,8 +27,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:4.2.0'
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server:4.2.0'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
 
 
     implementation 'org.aspectj:aspectjweaver:1.9.22.1'

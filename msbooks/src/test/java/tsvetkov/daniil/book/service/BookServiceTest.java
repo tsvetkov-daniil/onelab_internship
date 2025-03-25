@@ -1,17 +1,17 @@
 package tsvetkov.daniil.book.service;
 
 import org.assertj.core.api.Assertions;
+import org.camunda.bpm.engine.test.Deployment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import tsvetkov.daniil.book.dto.Book;
-import tsvetkov.daniil.book.dto.BookStatus;
-import tsvetkov.daniil.book.dto.Category;
-import tsvetkov.daniil.book.dto.Language;
-import tsvetkov.daniil.book.event.EventProducer;
+import tsvetkov.daniil.book.entity.Book;
+import tsvetkov.daniil.book.entity.BookStatus;
+import tsvetkov.daniil.book.entity.Category;
+import tsvetkov.daniil.book.entity.Language;
 import tsvetkov.daniil.book.repository.BookRepository;
 
 import java.util.Date;
@@ -223,5 +223,15 @@ class BookServiceTest {
         Book updatedBook = bookService.deleteAuthorFromBook(savedBook.getId(), 1L);
 
         Assertions.assertThat(updatedBook.getAuthors()).isEmpty();
+    }
+
+
+    @Test
+    @Deployment(resources = "book-approval.bpmn")  // Указываем путь к вашему BPMN файлу
+    public void testStartBookApprovalProcess() {
+        // Уникальный ID книги для теста
+        Book book = createValidBook();
+        Book savedBook = bookService.save(book);
+
     }
 }

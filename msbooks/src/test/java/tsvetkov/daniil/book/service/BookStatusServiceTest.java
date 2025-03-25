@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
-import tsvetkov.daniil.book.dto.BookStatus;
+import tsvetkov.daniil.book.entity.BookStatus;
 import tsvetkov.daniil.book.repository.BookStatusRepository;
 
 import java.util.Optional;

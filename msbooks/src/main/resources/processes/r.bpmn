@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+             targetNamespace="http://example.com/bpmn">
+
+  <process id="bookApprovalProcess" name="Процесс одобрения книги" isExecutable="true" camunda:historyTimeToLive="6">
+
+    <!-- Начало процесса -->
+    <startEvent id="startEvent" name="Книга сохранена">
+      <outgoing>flow1</outgoing>
+    </startEvent>
+
+    <!-- Автоматическое присвоение статуса "Ждет одобрения" -->
+    <serviceTask id="setPendingStatus" name="Установить статус 'Ждет одобрения'" camunda:class="tsvetkov.daniil.book.service.BookService.mBook">
+      <incoming>flow1</incoming>
+      <outgoing>flow2</outgoing>
+    </serviceTask>
+
+    <!-- Ручное задание для проверки книги -->
+    <userTask id="reviewTask" name="Проверка книги" camunda:assignee="reviewer">
+      <incoming>flow2</incoming>
+      <outgoing>flow3</outgoing>
+    </userTask>
+
+    <!-- Решение: Одобрить или Отклонить -->
+    <exclusiveGateway id="approvalGateway" default="flow6">
+      <incoming>flow3</incoming>
+      <outgoing>flow5</outgoing>
+      <outgoing>flow6</outgoing>
+    </exclusiveGateway>
+
+    <!-- Книга одобрена -->
+    <serviceTask id="setApprovedStatus" name="Установить статус 'Одобрено'" camunda:class="ctsvetkov.daniil.book.service.BookService.aprooveBook">
+      <incoming>flow5</incoming>
+      <outgoing>flow7</outgoing>
+    </serviceTask>
+
+    <!-- Конец процесса после одобрения -->
+    <endEvent id="endEventApproved" name="Книга одобрена">
+      <incoming>flow7</incoming>
+    </endEvent>
+
+    <!-- Книга отклонена -->
+    <serviceTask id="setRejectedStatus" name="Установить статус 'Отклонено'" camunda:class="tsvetkov.daniil.book.service.BookService.setRejectedStatus">
+      <incoming>flow6</incoming>
+      <outgoing>flow8</outgoing>
+    </serviceTask>
+
+    <!-- Конец процесса после отклонения -->
+    <endEvent id="endEventRejected" name="Книга отклонена">
+      <incoming>flow8</incoming>
+    </endEvent>
+
+    <!-- Потоки -->
+    <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="setPendingStatus"/>
+    <sequenceFlow id="flow2" sourceRef="setPendingStatus" targetRef="reviewTask"/>
+    <sequenceFlow id="flow3" sourceRef="reviewTask" targetRef="approvalGateway"/>
+
+    <!-- Условия -->
+    <sequenceFlow id="flow5" sourceRef="approvalGateway" targetRef="setApprovedStatus">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${approved == true}</bpmn:conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow id="flow6" sourceRef="approvalGateway" targetRef="setRejectedStatus"/>
+
+    <sequenceFlow id="flow7" sourceRef="setApprovedStatus" targetRef="endEventApproved"/>
+    <sequenceFlow id="flow8" sourceRef="setRejectedStatus" targetRef="endEventRejected"/>
+
+  </process>
+</definitions>

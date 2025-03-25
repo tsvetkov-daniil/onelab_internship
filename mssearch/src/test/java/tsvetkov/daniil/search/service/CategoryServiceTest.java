@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import tsvetkov.daniil.search.dto.Category;
+import tsvetkov.daniil.search.entity.Category;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,7 +30,7 @@ class CategoryServiceTest {
     @BeforeEach
     void setUp() {
         testCategory = Category.builder()
-                .index(1L)
+                .id(1L)
                 .name("Фантастика")
                 .build();
         categoryService.deleteAll();
@@ -47,15 +47,16 @@ class CategoryServiceTest {
 
     @Test
     @DisplayName("Предложение категорий")
-    void testSuggestCategories() throws IOException {
-        List<String> suggestions = categoryService.suggestCategories("Фан", 5);
+    void testSuggestCategoriesByName() throws IOException {
+        System.err.println(categoryService.findByNameContaining("Фан"));
+        List<String> suggestions = categoryService.suggestCategoriesByName("Фан", 5);
         assertThat(suggestions).contains("Фантастика");
     }
 
     @Test
     @DisplayName("Удаление категории по индексу")
-    void testDeleteByIndex() {
-        categoryService.deleteByIndex(1L);
+    void testDeleteById() {
+        categoryService.deleteById(1L);
         Set<Category> categories = categoryService.findByNameContaining("Фантастика");
         assertThat(categories).isEmpty();
     }

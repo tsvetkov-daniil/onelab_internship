@@ -2,14 +2,11 @@ package tsvetkov.daniil.search.repository;
 
 
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
-import tsvetkov.daniil.search.dto.Author;
+import org.springframework.stereotype.Repository;
+import tsvetkov.daniil.search.entity.Author;
 
-import java.util.List;
-
+@Repository
 public interface AuthorSearchRepository extends ElasticsearchRepository<Author, String> {
-    List<Author> findByNicknameContaining(String nickname);
-
-    void deleteByIndex(Long index);
-
+    void deleteById(Long id);
     void deleteAll();
 }

@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
-import tsvetkov.daniil.book.dto.BookStatus;
+import tsvetkov.daniil.book.entity.BookStatus;
 
 import java.util.Optional;
 

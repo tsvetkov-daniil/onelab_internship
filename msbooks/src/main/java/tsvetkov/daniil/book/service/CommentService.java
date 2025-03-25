@@ -1,41 +1,44 @@
 package tsvetkov.daniil.book.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tsvetkov.daniil.book.dto.Comment;
+import org.springframework.validation.annotation.Validated;
+import tsvetkov.daniil.book.entity.Comment;
+import tsvetkov.daniil.book.exception.CommentNotFoundException;
 import tsvetkov.daniil.book.repository.CommentRepository;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Service
+@AllArgsConstructor
+@Validated
 public class CommentService {
+
     private final CommentRepository commentRepository;
 
-    @Autowired
-    public CommentService(CommentRepository commentRepository) {
-        this.commentRepository = commentRepository;
-    }
-
     @Transactional
-    public Comment save(Comment comment) {
+    public Comment save(@Valid Comment comment) {
         return commentRepository.save(comment);
     }
 
+    @Transactional(readOnly = true)
     public Comment findById(Long id) {
         return commentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Комментарий с id: " + id + "не найден"));
+                .orElseThrow(CommentNotFoundException::new);
     }
 
+    @Transactional(readOnly = true)
     public Set<Comment> findAllByBookId(Long bookId, Integer pageNumber, Integer pageSize) {
         return new HashSet<>(commentRepository.findByBook_Id(bookId, PageRequest.of(pageNumber, pageSize)).getContent());
     }
 
-
     @Transactional
-    public void delete(Long id) {
+    public void deleteById(Long id) {
+        findById(id);
         commentRepository.deleteById(id);
     }
 
@@ -43,5 +46,4 @@ public class CommentService {
     public void deleteAll() {
         commentRepository.deleteAll();
     }
-
 }

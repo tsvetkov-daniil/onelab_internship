@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import tsvetkov.daniil.book.dto.Category;
-import tsvetkov.daniil.book.event.EventProducer;
+import tsvetkov.daniil.book.entity.Category;
 import tsvetkov.daniil.book.repository.CategoryRepository;
 
 import java.util.List;

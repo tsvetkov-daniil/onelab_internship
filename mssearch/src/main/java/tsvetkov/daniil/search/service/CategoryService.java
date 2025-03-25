@@ -1,64 +1,50 @@
 package tsvetkov.daniil.search.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
-import co.elastic.clients.elasticsearch.core.search.CompletionSuggestOption;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import tsvetkov.daniil.search.dto.Category;
+import tsvetkov.daniil.search.entity.Category;
+import tsvetkov.daniil.search.exception.CategoryNotFoundException;
 import tsvetkov.daniil.search.repository.CategoryRepository;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
-public class CategoryService {
-    private final ElasticsearchClient elasticsearchClient;
+public class CategoryService extends AbstractSearchService<Category, String> {
+
+    private static final String CATEGORY_INDEX = "category";
+
     private final CategoryRepository categoryRepository;
 
     @Autowired
     public CategoryService(ElasticsearchClient elasticsearchClient, CategoryRepository categoryRepository) {
-        this.elasticsearchClient = elasticsearchClient;
+        super(elasticsearchClient, categoryRepository);
         this.categoryRepository = categoryRepository;
     }
 
-    @Transactional
-    public Category save(Category category) {
-        return categoryRepository.save(category);
+    @Override
+    protected String getIndexName() {
+        return CATEGORY_INDEX;
     }
 
-    public List<String> suggestCategories(String prefix, Integer size) throws IOException {
-        SearchResponse<Category> response = elasticsearchClient.search(s -> s
-                        .index("category")
-                        .suggest(sug -> sug
-                                .suggesters("name-suggest", s1 -> s1
-                                        .completion(c -> c
-                                                .field("name")
-                                                .skipDuplicates(true)
-                                                .size(size)
-                                        )
-                                        .prefix(prefix)
-                                )
-                        ),
-                Category.class);
-
-        return response.suggest().values().stream()
-                .flatMap(List::stream)
-                .flatMap(suggestion -> suggestion.completion().options().stream())
-                .map(CompletionSuggestOption::text)
-                .distinct()
-                .collect(Collectors.toList());
+    @Override
+    protected RuntimeException newEntityNotFoundException() {
+        return new CategoryNotFoundException();
     }
 
-    public void deleteByIndex(Long index) {
-        categoryRepository.deleteByIndex(index);
+    @Override
+    protected Class<Category> getEntityClass() {
+        return Category.class;
     }
 
-    public void deleteAll() {
-    categoryRepository.deleteAll();
+    public Set<Category> suggestCategoriesByName(String prefix, Integer size) throws IOException {
+        return new HashSet<>(suggestByField(prefix, size, "name"));
+    }
+
+    public Set<Category> searchCategoriesByName(String prefix, Integer pageNumber, Integer pageSize) throws IOException {
+        return new HashSet<>(searchByField(prefix, pageNumber, pageSize, "name").getContent());
     }
 
     public Set<Category> findByNameContaining(String name) {

@@ -1,65 +1,73 @@
 package tsvetkov.daniil.search.event;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
-import tsvetkov.daniil.search.dto.Author;
-import tsvetkov.daniil.search.dto.Book;
-import tsvetkov.daniil.search.dto.Category;
-import tsvetkov.daniil.search.service.AuthorSearchService;
+import tsvetkov.daniil.dto.BookDTO;
+import tsvetkov.daniil.dto.CategoryDTO;
+import tsvetkov.daniil.dto.ReaderDTO;
+import tsvetkov.daniil.dto.ReviewDTO;
+import tsvetkov.daniil.search.entity.Author;
+import tsvetkov.daniil.search.entity.Book;
+import tsvetkov.daniil.search.entity.Category;
+import tsvetkov.daniil.search.entity.Review;
+import tsvetkov.daniil.search.service.AuthorService;
 import tsvetkov.daniil.search.service.BookSearchService;
 import tsvetkov.daniil.search.service.CategoryService;
+import tsvetkov.daniil.search.service.ReviewService;
+import tsvetkov.daniil.util.mapper.Mapper;
 
+@RequiredArgsConstructor
 @Service
 public class EventConsumer {
-    private final BookSearchService bookSearchService;
+    private final AuthorService authorService;
+    private final BookSearchService bookService;
     private final CategoryService categoryService;
-    private final AuthorSearchService authorSearchService;
+    private final ReviewService reviewService;
+    private final Mapper mapper;
 
-    @Autowired
-    public EventConsumer(BookSearchService bookSearchService, CategoryService categoryService, AuthorSearchService authorSearchService)
-    {
-        this.bookSearchService = bookSearchService;
-        this.categoryService = categoryService;
-        this.authorSearchService = authorSearchService;
+    @KafkaListener(topics = "author-create-search")
+    public void consumeAuthorCreate(ReaderDTO authorDTO) {
+        Author author = mapper.map(authorDTO, Author.class);
+        authorService.save(author);
     }
 
-    @KafkaListener(topics = "book_add_search", groupId = "search-group")
-    public void listen(Book bookEvent) throws Exception {
-        System.err.println(bookEvent.toString());
-       // bookService.save(bookEvent);
+    @KafkaListener(topics = "author-delete-search")
+    public void consumeAuthorDelete(Long authorId) {
+        authorService.deleteById(authorId);
     }
 
-    @KafkaListener(topics = "category_add_search", groupId = "search-group")
-    public void listen(Category category) {
+    @KafkaListener(topics = "book-create-search")
+    public void consumeBookCreate(BookDTO bookDTO) {
+        Book book = mapper.map(bookDTO, Book.class);
+        bookService.save(book);
+    }
+
+    @KafkaListener(topics = "book-delete-search")
+    public void consumeBookDelete(Long bookId) {
+        bookService.deleteById(bookId);
+    }
+
+    @KafkaListener(topics = "category-create-search")
+    public void consumeCategoryCreate(CategoryDTO categoryDTO) {
+        Category category = mapper.map(categoryDTO, Category.class);
         categoryService.save(category);
     }
 
-    @KafkaListener(topics = "author_add_search", groupId = "search-group")
-    public void listen(Author author) {
-        authorSearchService.save(author);
+    @KafkaListener(topics = "category-delete-search")
+    public void consumeCategoryDelete(Long categoryId) {
+        categoryService.deleteById(categoryId);
     }
 
-
-    @KafkaListener(topics = "book_remove_search", groupId = "search-group")
-    public void listenRemoveBook(Long id) throws Exception {
-        bookSearchService.deleteByIndex(id);
+    @KafkaListener(topics = "review-create-search")
+    public void consumeReviewCreate(ReviewDTO reviewDTO) {
+        Review review = mapper.map(reviewDTO, Review.class);
+        reviewService.save(review);
     }
 
-    @KafkaListener(topics = "category_remove_search", groupId = "search-group")
-    public void listenRemoveCategory(Long id) throws Exception {
-        categoryService.deleteByIndex(id);
+    @KafkaListener(topics = "review-delete-search")
+    public void consumeReviewDelete(Long reviewId) {
+        reviewService.deleteById(reviewId);
     }
-
-    @KafkaListener(topics = "author_remove_search", groupId = "search-group")
-    public void listenRemoveAuthor(Long id) throws Exception {
-        authorSearchService.deleteByIndex(id);
-    }
-
-    @KafkaListener(topics = "add_author_search", groupId = "search-group")
-    public void listenRemoveAuthor(Author author) throws Exception {
-        authorSearchService.save(author);
-    }
-
-
 }
+
